@@ -8,7 +8,7 @@ import {
     Alert
 } from 'react-native'
 import React from 'react'
-import firebase from '../../firebase'
+import { firebase, db } from '../../firebase'
 
 import { Formik } from 'formik'
 import * as Yup from 'yup'
@@ -24,10 +24,25 @@ const LoginForm = ({navigation}) => {
 
     const onLogin = async (email, password) => {
         try {
-            await firebase.auth().siginInWithEmailAndPassword(email, password)
+            await firebase.auth().signInWithEmailAndPassword(email, password)
             console.log('Firebase Login Sucessful!', email, password)
         } catch (error) {
-            Alert.alert(error.message)
+            Alert.alert(
+                'Sorry...',
+                error.message + '\n\n What would you like to do next?',
+                [
+                    {
+                        text: 'OK',
+                        onPress: () => console.log('OK'),
+                        style: 'cancel',
+                    },
+                    {
+                        text: 'Sign Up',
+                        onPress: () => navigation.push('SignupScreen'),
+                        style: 'default'
+                    }
+                ]
+            )
         }
     }
 
@@ -36,7 +51,7 @@ const LoginForm = ({navigation}) => {
             <Formik
                 initialValues={{email: '', password: ''}}
                 onSubmit={values => {
-                    console.log(values)
+                    onLogin(values.email, values.password)
                 }}
                 validationSchema={LoginFormSchema}
                 validateOnMount={true}
