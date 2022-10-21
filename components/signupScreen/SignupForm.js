@@ -4,41 +4,31 @@ import {
     TextInput, 
     StyleSheet, 
     Pressable, 
-    TouchableOpacity,
-    Alert
+    TouchableOpacity 
 } from 'react-native'
 import React from 'react'
-import firebase from '../../firebase'
 
 import { Formik } from 'formik'
 import * as Yup from 'yup'
 import Validator from 'email-validator'
 
-const LoginForm = ({navigation}) => {
-    const LoginFormSchema = Yup.object().shape({
+const SignupForm = ({navigation}) => {
+    const SignupFormSchema = Yup.object().shape({
         email: Yup.string().email().required('An email is required'),
+        username: Yup.string().required().min(2, 'A user name is required'),
         password: Yup.string()
             .required()
-            .min(6, 'Your password must have at least 6 characters')
+            .min(6, 'Your password has to have at least 6 characters')
     })
-
-    const onLogin = async (email, password) => {
-        try {
-            await firebase.auth().siginInWithEmailAndPassword(email, password)
-            console.log('Firebase Login Sucessful!', email, password)
-        } catch (error) {
-            Alert.alert(error.message)
-        }
-    }
 
     return (
         <View style={styles.wrapper}>
             <Formik
-                initialValues={{email: '', password: ''}}
+                initialValues={{email: '', username: '', password: ''}}
                 onSubmit={values => {
                     console.log(values)
                 }}
-                validationSchema={LoginFormSchema}
+                validationSchema={SignupFormSchema}
                 validateOnMount={true}
             >
                 {({ handleChange, handleBlur, handleSubmit, values, isValid }) => (
@@ -54,14 +44,33 @@ const LoginForm = ({navigation}) => {
                         ]}>
                             <TextInput 
                                 placeholderTextColor='#444'
-                                placeholder='Phone number, username or email'
+                                placeholder='Email'
                                 autoCapitalize='none'
                                 keyboardType='email-address'
-                                textContentType='emailAddress'
                                 autoFocus={true}
                                 onChangeText={handleChange('email')}
                                 onBlur={handleBlur('email')}
                                 value={values.email}
+                            />
+                        </View>
+
+                        <View style={[
+                            styles.inputField,
+                            {
+                                borderColor:
+                                    1 > values.username.length || values.username.length >= 2
+                                        ? '#ccc'
+                                        : 'red'
+                            },
+                        ]}>
+                            <TextInput 
+                                placeholderTextColor='#444'
+                                placeholder='Username'
+                                autoCapitalize='none'
+                                textContentType='username'
+                                onChangeText={handleChange('username')}
+                                onBlur={handleBlur('username')}
+                                value={values.username}
                             />
                         </View>
 
@@ -78,7 +87,6 @@ const LoginForm = ({navigation}) => {
                                 placeholderTextColor='#444'
                                 placeholder='Password'
                                 autoCapitalize='none'
-                                autoCorrect={false}
                                 secureTextEntry={true}
                                 textContentType='password'
                                 onChangeText={handleChange('password')}
@@ -86,22 +94,17 @@ const LoginForm = ({navigation}) => {
                                 value={values.password}
                             />
                         </View>
-                        <View style={{ alignItems: 'flex-end', marginBottom: 30 }}>
-                            <Text style={{ color: '#6BB0F5' }}>Forgot passwaord?</Text>
-                        </View>
-
                         <Pressable 
                             titleSize={20} 
                             style={styles.button(isValid)} 
                             onPress={handleSubmit}
                         >
-                            <Text style={styles.buttonText}>Log In</Text>
+                            <Text style={styles.buttonText}>Sign Up</Text>
                         </Pressable>
-
-                        <View style={styles.signupContainer}>
-                            <Text>Don't have an account?</Text>
-                            <TouchableOpacity onPress={() => navigation.push('SignupScreen')}>
-                                <Text style={{ color: '#6BB0F5' }}> Sign Up</Text>
+                        <View style={styles.loginContainer}>
+                            <Text>Already have an account?</Text>
+                            <TouchableOpacity onPress={() => navigation.goBack()}>
+                                <Text style={{ color: '#6BB0F5' }}> Log in</Text>
                             </TouchableOpacity>
                         </View>
                     </>
@@ -114,7 +117,6 @@ const LoginForm = ({navigation}) => {
 const styles = StyleSheet.create({
     wrapper: {
         marginTop: 80,
-        height: '100%',
     },
 
     inputField: {
@@ -131,6 +133,7 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         minHeight: 42,
         borderRadius: 4,
+        marginTop: 50,
     }),
 
     buttonText: {
@@ -139,7 +142,7 @@ const styles = StyleSheet.create({
         fontSize: 20,
     },
 
-    signupContainer: {
+    loginContainer: {
         flexDirection: 'row',
         width: '100%',
         justifyContent: 'center',
@@ -147,4 +150,4 @@ const styles = StyleSheet.create({
     },
 })
 
-export default LoginForm
+export default SignupForm
