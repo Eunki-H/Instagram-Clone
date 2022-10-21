@@ -1,4 +1,4 @@
-import { View, Text, StyleSheet, Image, TouchableOpacity } from 'react-native'
+import { View, StyleSheet, Image, TouchableOpacity } from 'react-native'
 import React, { useState } from 'react'
 import { Divider } from 'react-native-elements'
 
@@ -9,7 +9,13 @@ const BottomTabs = ({ icons }) => {
         <TouchableOpacity onPress={() => setActiveTab(icon.name)}>
             <Image 
                 source={{ uri: activeTab === icon.name ? icon.active : icon.inactive }} 
-                style={styles.icon}
+                style={[
+                    styles.icon, 
+                    icon.name === 'Profile' ? styles.profilePic() : null,
+                    activeTab === 'Profile' && icon.name === activeTab 
+                    ? styles.profilePic(activeTab) 
+                    : null,
+                ]}
             />
         </TouchableOpacity>
     )
@@ -45,6 +51,12 @@ const styles = StyleSheet.create({
         width: 30,
         height: 30,
     },
+
+    profilePic: (activeTab = '') => ({
+        borderRadius: 50,
+        borderWidth: activeTab === 'Profile' ? 2 : 0, 
+        borderColor: '#fff',
+    }),
 })
 
 export default BottomTabs
